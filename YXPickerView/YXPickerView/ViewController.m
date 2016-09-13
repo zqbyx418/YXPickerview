@@ -18,10 +18,19 @@
 @property (nonatomic, strong) NSArray *gzCounty;
 @property (nonatomic, strong) NSArray *szCounty;
 @property (nonatomic, strong) NSArray *bjCounty;
+@property (nonatomic, strong) NSMutableArray *titleArrayM;
 
 @end
 
 @implementation ViewController
+
+- (NSMutableArray *)titleArrayM
+{
+    if (!_titleArrayM) {
+        _titleArrayM = [NSMutableArray array];
+    }
+    return _titleArrayM;
+}
 
 - (NSArray *)province
 {
@@ -74,20 +83,37 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+    [self setupUI];
+}
+
+- (void)setupUI
+{
     UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
     button.frame = CGRectMake(0, 50, 50, 30);
     [button setTitle:@"show" forState:UIControlStateNormal];
     [self.view addSubview:button];
     [button addTarget:self action:@selector(showButtonClicked) forControlEvents:UIControlEventTouchUpInside];
-
+    
+    NSArray *dataArray = @[self.province,self.city, self.shCounty, self.gzCounty];
+    
     // 把需要显示的数据放入一个数组
-    YXPickerView *pickView = [[YXPickerView alloc] initWithDataArray:@[self.province,self.city, self.shCounty, self.gzCounty]];
+    YXPickerView *pickView = [[YXPickerView alloc] initWithDataArray: dataArray];
     pickView.delegate = self;
     pickView.backgroundColor = [UIColor orangeColor]; // 注意: 这是修改蒙版颜色！
     pickView.toolBarTextColor = [UIColor redColor];
     pickView.pickerViewBackColor = [UIColor blueColor];
     self.pickerView = pickView;
+    
+    CGFloat width = self.view.bounds.size.width/dataArray.count;
+    for (int i = 0; i<dataArray.count; i++) {
+        UILabel *label = [UILabel new];
+        label.frame = CGRectMake(i*width, 100, self.view.bounds.size.width/dataArray.count, 30);
+        label.textAlignment = NSTextAlignmentCenter;
+        label.textColor = [UIColor orangeColor];
+        [self.titleArrayM addObject:label];
+        [self.view addSubview:label];
+    }
+    
 }
 
 - (void)showButtonClicked
@@ -99,6 +125,11 @@
 - (void)YXPickerViewDidEnsureButton:(YXPickerView *)pickerView withResultArray:(NSMutableArray *)resultArray
 {
     NSLog(@"%@",resultArray);
+    for (int i = 0; i<resultArray.count; i++) {
+        UILabel *label = self.titleArrayM[i];
+        label.text = resultArray[i];
+    }
+    
 }
 
 @end
